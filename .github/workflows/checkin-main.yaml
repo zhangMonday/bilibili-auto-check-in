@@ -18,24 +18,14 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: '3.9'
-        
+      
     - name: 安装依赖包
       run: |
-        python -m pip install --upgrade pip  # 升级 pip 工具
-        pip install requests  # 安装 requests 库
+        python -m pip install --upgrade pip
+        pip install requests
         
-    - name: 执行B站签到脚本（日志在这里看）
+    - name: 执行B站签到脚本
       env:
-        BILIBILI_CONFIGS: ${{ secrets.BILIBILI_CONFIGS }}  # 从密钥中获取B站配置
+        BILIBILI_CONFIGS: ${{ secrets.BILIBILI_CONFIGS }}
       run: |
-        python bilibili_checkin.py  # 运行签到脚本
-        
-    - name: 通过 Telegram 发送通知（可选）
-      if: always()  # 无论任务成功与否都执行
-      uses: appleboy/telegram-action@master
-      with:
-        to: ${{ secrets.TELEGRAM_TO }}  # 接收通知的 Telegram 用户ID
-        token: ${{ secrets.TELEGRAM_TOKEN }}  # Telegram 机器人令牌
-        message: |
-          B站多账号自动签到完成！
-          状态：${{ job.status }}
+        python bilibili_checkin.py
