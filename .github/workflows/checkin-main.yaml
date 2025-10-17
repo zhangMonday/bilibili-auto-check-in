@@ -1,0 +1,41 @@
+name: B站自动签到主脚本
+
+on:
+  schedule:
+    # 每天 UTC 时间 00:00 运行（北京时间 08:00）
+    - cron: '0 0 * * *'
+  workflow_dispatch:  # 允许手动触发
+
+jobs:
+  checkin:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 拉取代码仓库
+      uses: actions/checkout@v3
+      
+    - name: 配置 Python 环境
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'版本
+        
+    - name: 安装依赖包
+      run: |
+        python -m pip install --upgrade pip  # 升级 pip 工具
+        pip install requests  # 安装 requests 库
+        
+    - name: 执行B站签到脚本（日志在这里看）
+      env:
+        BILIBILI_CONFIGS: ${{ secrets.BILIBILI_CONFIGS }}  # 从密钥中获取B站配置
+      run: |
+        python bilibili_checkin.py  # 运行签到脚本
+        
+    - name: 通过 Telegram 发送通知（可选）
+      if: always()  # 无论任务成功与否都执行
+      uses: appleboy/telegram-action@master
+      with:
+        to: ${{ secrets.TELEGRAM_TO }}  # 接收通知的 Telegram 用户ID
+        token: ${{ secrets.TELEGRAM_TOKEN }}  # Telegram 机器人令牌
+        message: |
+          B站多账号自动签到完成！
+          状态：${{ job.status }}
